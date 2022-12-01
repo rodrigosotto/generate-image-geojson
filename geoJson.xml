@@ -1,4 +1,4 @@
-<Map srs="+init=epsg:3857">
+<Map srs="+init=epsg:3857" background-image="./bkteste.png">
     <Style name="geoms">
         <Rule>
             <Filter>[mapnik::geometry_type]=polygon or [fill]</Filter>

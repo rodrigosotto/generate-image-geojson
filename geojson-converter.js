@@ -3,6 +3,8 @@ const { default: center } = require("@turf/center");
 const axios = require("axios");
 const { centerOfMass } = require("@turf/turf");
 
+const geojsonData = require("./1db.json")
+
 var mapnik = require("mapnik");
 var fs = require("fs");
 
@@ -49,14 +51,13 @@ async function getMapboxImage(lat, long, geoJsonCorret) {
 async function getUrlJsonTrails() {
     const url = "http://localhost:3000/evento/";
 
-    let evento = await axios.get(url, { responseType: "json" });
+    let evento = await axios.get(url, {  });
     //console.log(JSON.stringify("Todos os dados-->"evento.data.trails, "<--Final Todos os dados"));
     // console.log("dados geoJson-->", evento.data.trails.inst_rate, "<-- dados geoJson");
-
-    convertTrailsToGeoJson(evento.data.trails.inst_rate, "Polygon");
+    convertTrailsToGeoJson(geojsonData.evento.trails.inst_rate, "Polygon");
 
     const geoJsonCorret = rewind(
-        convertTrailsToGeoJson(evento.data.trails.inst_rate, "Polygon")
+        convertTrailsToGeoJson(geojsonData.evento.trails.inst_rate, "Polygon")
     );
 
     const [long, lat] = center(geoJsonCorret).geometry.coordinates;
@@ -66,6 +67,7 @@ async function getUrlJsonTrails() {
 
     //console.log(center(geoJsonCorret).geometry.coordinates)
 }
+
 getUrlJsonTrails();
 
 function convertTrailsToGeoJson(trails, geometryType) {
@@ -161,19 +163,41 @@ if (process.env.NODE_ENV == "test") {
     };
 }
 
-// function convertToXml() {
+function convertToXml() {
 //    // 1o PASSO precisa gerar automaticamnte o XML
 //     mapnik.register_default_input_plugins();
 //     var map = new mapnik.Map(1200, 500);
-//     //const layer = new mapnik.Layer('./bkgnd.jpg')
+//     const layer = new mapnik.Layer('./bkgnd.jpg')
 
 //     map.add_layer(layer);
 //     map.loadSync("./geoJson.xml");
 //     map.zoomAll();
 //     map.renderFileSync("exampleImageGeoJson.jpeg");
 
-// }
-// convertToXml();
+// register fonts and datasource plugins
+mapnik.register_default_fonts();
+mapnik.register_default_input_plugins();
+
+var map = new mapnik.Map(256, 256);
+map.load('./geoJson.xml', function(err,map) {
+
+    if (err) throw err;
+    map.zoomAll();
+ 
+    var im = new mapnik.Image(300, 300);
+    map.render(im, function(err,im) {
+      if (err) throw err;
+      im.encode('png', function(err,buffer) {
+          if (err) throw err;
+          fs.writeFile('thumbMap.png',buffer, function(err) {
+              if (err) throw err;
+              console.log('saved map image to map.png');
+          });
+      });
+    });
+});
+}
+convertToXml();
 
 
 
