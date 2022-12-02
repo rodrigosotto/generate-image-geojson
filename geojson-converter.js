@@ -184,12 +184,13 @@ map.load('./geoJson.xml', function(err,map) {
     if (err) throw err;
     map.zoomAll();
  
-    var im = new mapnik.Image(300, 300);
-    map.render(im, function(err,im) {
+    var image = new mapnik.Image(280, 260, {painted: true});
+ 
+    map.render(image, function(err,image) {
       if (err) throw err;
-      im.encode('png', function(err,buffer) {
+      image.encode('png', function(err,buffer) {
           if (err) throw err;
-          fs.writeFile('thumbMap.png',buffer, function(err) {
+          fs.writeFile('thumbMapRaster.png',buffer, function(err) {
               if (err) throw err;
               console.log('saved map image to map.png');
           });
