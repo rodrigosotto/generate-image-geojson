@@ -18,8 +18,10 @@
   },
   "homepage": "https://github.com/rodrigosotto/generate-image-geojson#readme",
   "dependencies": {
+    "@mapbox/geojson-mapnikify": "^3.0.2-dev",
     "@turf/turf": "^6.5.0",
     "axios": "^1.2.0",
+    "geojson-mapnikify-image": "^1.0.3",
     "mapnik": "^4.5.9"
   }
 }
