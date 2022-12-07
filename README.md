@@ -1,4 +1,4 @@
-# Generate-image-geojson
+# Gerar uma imagem de um GEOJSON/POLIGONOS/RASTROS
 Gera uma imagem a partir de um geojson, renderizando os poligonos nele contido bem como a layer.
 Para Gerar esta imagem, convertemos um GEOJSON em XML e depois fazemos o processo de conversão tanto para png, jpeg qunto para base64.
 
