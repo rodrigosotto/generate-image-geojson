@@ -9,7 +9,7 @@ Depois rodar o seguinte comando node "generate-thumbs-base64.js", assim ira gera
 
 
 # Melhorias
-Criar uma API
-Enviar as imagens (base64) para a API
-Consumir/Usar estas imagens (base64) no frontend (Angular)
-Publicar na VERCEL
+- Criar uma API (nodeJs)
+- Enviar as imagens (base64) para a API
+- Consumir/Usar estas imagens (base64) no frontend (Angular)
+- Publicar na VERCEL ou algo parecido.
