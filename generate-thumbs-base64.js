@@ -26,7 +26,6 @@ mapnikify(geojson, false, function (err, xml) {
   mapnik.register_default_input_plugins();
 
   map.fromString(xml, {}, function (err, map) {
-    //console.log("XML AQUI--->", xml, "<---XML AQUI");
     if (err) throw err;
 
     var im = new mapnik.Image(width, height, {
@@ -72,8 +71,6 @@ async function getMapboxImage(bbox) {
     "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static";
   const sizeMap = "512x512";
 
-  // const url = `${mapboxPrefix}/${long},${lat},${zoom}/${width}x${heigth}@2x?access_token=${mapBoxAPIKey}`;
-
   const url = `${mapboxPrefix}/[${bbox}]/${sizeMap}@2x?access_token=${mapBoxAPIKey}`;
 
   let staticMapImage = await axios
@@ -82,8 +79,7 @@ async function getMapboxImage(bbox) {
       console.log(error);
       return returnedB64;
     });
-    let returnedB64 = Buffer.from(staticMapImage.data).toString("base64"); //covertido para base64
-    //console.log("base64-->",returnedB64);
+    let returnedB64 = Buffer.from(staticMapImage.data).toString("base64");
     
   fs.writeFileSync("Xbkgnd2.jpg", staticMapImage.data);
   fs.writeFileSync("Xbase64Bckgnd.txt", returnedB64);
