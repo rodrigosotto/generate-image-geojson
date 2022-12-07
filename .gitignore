@@ -1,0 +1,13 @@
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Miscellaneous
+/coverage
