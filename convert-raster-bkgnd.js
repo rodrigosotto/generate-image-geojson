@@ -42,7 +42,6 @@ mapnikify(geojson, false, function (err, xml) {
 
     map.render(im, function (err, im) {
       if (err) throw err;
-      //console.log("IM-->", im);
       getMapboxImage(geojsonBBox).then(
         (backgroundImage) => {
             im.encode("png", function (err, buffer) {
