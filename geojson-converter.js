@@ -35,8 +35,8 @@ async function getMapboxImage(lat, long, geoJsonCorret) {
     "pk.eyJ1IjoidGF0dWFnZ2lvIiwiYSI6ImNrc3piOGw1YzB4dG4ycnFpdmt6NGY2N2kifQ.Nqyq6en7l-YO3XMWa1gebw";
   const mapboxPrefix =
     "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/";
-  const width = "400";
-  const heigth = "400";
+  const width = "1024";
+  const heigth = "768";
   const zoom = "13.86";
 
   // const url = `${mapboxPrefix}/${long},${lat},${zoom}/${width}x${heigth}@2x?access_token=${mapBoxAPIKey}`;
@@ -110,7 +110,7 @@ function _customPointsToGeoJsonStandart(coordinateArray) {
       customCoordOnGeoJsonStd.push([coordinate.lng, coordinate.lat]);
     });
   } else {
-    console.log("sei la o que vai dar");
+    console.log("not found customCoordGeoJsonStd");
   }
 
   return customCoordOnGeoJsonStd;
@@ -125,6 +125,7 @@ function convertTrailsToGeoJson(trails, geometryType) {
     type: GEOJSON_CONSTANTS.featureCollection,
     features: geoJsonFeatures,
   };
+
   return geoJson;
 }
 
@@ -162,8 +163,6 @@ async function getUrlJsonTrails() {
 
   //gera o background satellite
   await getMapboxImage(lat, long, geoJsonCorret);
-
-  console.log(center(geoJsonCorret).geometry.coordinates);
 }
 
 getUrlJsonTrails();
@@ -190,30 +189,28 @@ getUrlJsonTrails();
 // convertGeoJsonInXmlFile();
 
 function convertXmlInImg() {
-// register fonts and datasource plugins
-mapnik.register_default_fonts();
-mapnik.register_default_input_plugins();
+  mapnik.register_default_fonts();
+  mapnik.register_default_input_plugins();
 
-var width = 1024;
-var height = 768;
+  var width = 1024;
+  var height = 768;
 
-var map = new mapnik.Map(width, height);
-var xmlFile = './dolomitoGeojson.xml';
+  var map = new mapnik.Map(width, height);
+  var xmlFile = "./xnovoDolomito.xml";
 
-map.load(xmlFile, function(err, map) {
-
+  map.load(xmlFile, function (err, map) {
     map.zoomAll();
 
     var image = new mapnik.Image(width, height, {
-        premultiplied: true,
+      premultiplied: true,
     });
 
-    map.render(image, function(err, image) {
-
-      image.save('rastrosImage.png', function() {
-        console.log("imagem foi salva!")
+    map.render(image, function (err, image) {
+      //map.save('./xnovoDolomito.xml');
+      image.save("rastrosImage.png", function () {
+        console.log("imagem foi salva!");
       });
     });
-});
+  });
 }
 convertXmlInImg();
