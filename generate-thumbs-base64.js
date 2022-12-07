@@ -5,14 +5,13 @@ const axios = require("axios");
 
 var fs = require("fs");
 const sphericalmercator = require("@mapbox/sphericalmercator");
-const { mainModule } = require("process");
 
 var width = 1024;
 var height = 1024;
-var outputFilename = "xexample2.png";
+var outputFilename = "./assets/imagesFiles/imageRaster.png";
 
 /* read GeoJSON into variable */
-var filename = "./dolomito.geojson";
+var filename = "./assets/geojsonFiles/simple.geojson";
 var geojson = JSON.parse(fs.readFileSync(filename));
 
 /* convert GeoJSON to Mapnik XML */
@@ -48,12 +47,12 @@ mapnikify(geojson, false, function (err, xml) {
               let returnedB64Raster = Buffer.from(buffer).toString("base64");
               fs.writeFile(outputFilename, buffer, function (err) {
                 if (err) throw err;
-                console.log("saved map image to " + outputFilename);
+                console.log("Imagem do rastro salva em: " + outputFilename);
               });
-              fs.writeFileSync("XrasterBase64.txt", returnedB64Raster);
+              fs.writeFileSync("./assets/txtFiles/rasterMapBase64File.txt", returnedB64Raster);
             });
             
-          console.log("SUCESSO");
+          console.log("SUCESSO IMAGEM DO RASTRO GERADA!");
         },
         (err) => {
           console.log(err);
@@ -81,8 +80,8 @@ async function getMapboxImage(bbox) {
     });
     let returnedB64 = Buffer.from(staticMapImage.data).toString("base64");
     
-  fs.writeFileSync("Xbkgnd2.jpg", staticMapImage.data);
-  fs.writeFileSync("Xbase64Bckgnd.txt", returnedB64);
+  fs.writeFileSync("./assets/imagesFiles/backgroundImageMap.jpeg", staticMapImage.data);
+  fs.writeFileSync("./assets/txtFiles/backgroundBase64.txt", returnedB64);
 
   return returnedB64;
 }
