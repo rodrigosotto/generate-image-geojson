@@ -12,7 +12,7 @@ var height = 1024;
 var outputFilename = "xexample2.png";
 
 /* read GeoJSON into variable */
-var filename = "./simple.geojson";
+var filename = "./dolomito.geojson";
 var geojson = JSON.parse(fs.readFileSync(filename));
 
 /* convert GeoJSON to Mapnik XML */
@@ -47,10 +47,10 @@ mapnikify(geojson, false, function (err, xml) {
             im.encode("png", function (err, buffer) {
               if (err) throw err;
               let returnedB64Raster = Buffer.from(buffer).toString("base64");
-              // fs.writeFile(outputFilename, buffer, function (err) {
-              //   if (err) throw err;
-              //   console.log("saved map image to " + outputFilename);
-              // });
+              fs.writeFile(outputFilename, buffer, function (err) {
+                if (err) throw err;
+                console.log("saved map image to " + outputFilename);
+              });
               fs.writeFileSync("XrasterBase64.txt", returnedB64Raster);
             });
             
@@ -85,7 +85,7 @@ async function getMapboxImage(bbox) {
     let returnedB64 = Buffer.from(staticMapImage.data).toString("base64"); //covertido para base64
     //console.log("base64-->",returnedB64);
     
-  //fs.writeFileSync("Xbkgnd2.jpg", staticMapImage.data);
+  fs.writeFileSync("Xbkgnd2.jpg", staticMapImage.data);
   fs.writeFileSync("Xbase64Bckgnd.txt", returnedB64);
 
   return returnedB64;
