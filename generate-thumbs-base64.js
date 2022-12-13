@@ -1,7 +1,9 @@
 var mapnik = require("mapnik");
 var mapnikify = require("@mapbox/geojson-mapnikify");
+
 const { default: bbox } = require("@turf/bbox");
 const { default: rewind } = require("@turf/rewind");
+
 const axios = require("axios");
 
 var fs = require("fs");
@@ -9,18 +11,23 @@ const sphericalmercator = require("@mapbox/sphericalmercator");
 
 var width = 1024;
 var height = 1024;
-var outputFilename = "./assets/imagesFiles/imageRaster.png";
+
+var outputFilename = (rasterName) => `./assets/imagesFiles/imageRaster_${rasterName}.png`;
+
 
 /* read GeoJSON into variable */
 // var filename = "./assets/geojsonFiles/dolomito.geojson";
 
-var filename = "./assets/jsonFiles/pigente";
+var filename = "./assets/jsonFiles/PIGENTE.NVG.JSON";
+
 var geojson = JSON.parse(fs.readFileSync(filename));
 
-const features = geojson.trails.inst_rate.map(
+const features = geojson.evento.trails.inst_rate.map(
   (instRate) => rewind({
           type: 'Feature',
-          properties: {},
+          properties: {
+            "fill":"#ff0000"
+          },
           geometry: {
               type: 'Polygon',
               coordinates: [
@@ -38,9 +45,35 @@ const features = geojson.trails.inst_rate.map(
       })
 );
 
+const featuresSpeed = geojson.evento.trails.speed.map(
+  (speed) => rewind({
+          type: 'Feature',
+          properties: {},
+          geometry: {
+              type: 'Polygon',
+              coordinates: [
+                  [
+                      ...speed.paths.map(
+                          (element) => [
+                              element.lng,
+                              element.lat,
+                          ]
+                      ),
+                      [speed.paths[0].lng, speed.paths[0].lat],
+                  ],
+              ],
+          },
+      })
+);
+
 const featureCollection = {
   type: 'FeatureCollection',
   features,
+};
+
+const featureCollectionSpeed = {
+  type: 'FeatureCollection',
+  features: featuresSpeed
 };
 
 // const result = await generateThumbnailImage(featureCollection).catch(
@@ -58,52 +91,64 @@ const featureCollection = {
 
 
 /* convert GeoJSON to Mapnik XML */
-mapnikify(featureCollection, false, function (err, xml) {
-  if (err) throw err;
+generateImageFromGeojson(featureCollection, "instRate");
 
-  const geojsonBBox = bbox(featureCollection);
-  /* render the Mapnik XML */
-  var map = new mapnik.Map(width, height);
+generateImageFromGeojson(featureCollectionSpeed, "speed");
 
-  mapnik.register_default_input_plugins();
 
-  map.fromString(xml, {}, function (err, map) {
-    if (err) throw err;
+function generateImageFromGeojson(featureCollection, trailsFileName) {
+  mapnikify(featureCollection, false, function (err, xml) {
+    if (err)
+      throw err;
 
-    var im = new mapnik.Image(width, height, {
-      premultiplied: false,
-    });
+    const geojsonBBox = bbox(featureCollection);
+    /* render the Mapnik XML */
+    var map = new mapnik.Map(width, height);
 
-    var merc = new sphericalmercator({
-      size: 1024,
-      antimeridian: false,
-    });
+    mapnik.register_default_input_plugins();
 
-    map.zoomToBox(merc.convert(geojsonBBox, "900913"));
+    map.fromString(xml, {}, function (err, map) {
+      if (err)
+        throw err;
 
-    map.render(im, function (err, im) {
-      if (err) throw err;
-      getMapboxImage(geojsonBBox).then(
-        (backgroundImage) => {
+      var im = new mapnik.Image(width, height, {
+        premultiplied: false,
+      });
+
+      var merc = new sphericalmercator({
+        size: 1024,
+        antimeridian: false,
+      });
+
+      map.zoomToBox(merc.convert(geojsonBBox, "900913"));
+
+      map.render(im, function (err, im) {
+        if (err)
+          throw err;
+        getMapboxImage(geojsonBBox).then(
+          (backgroundImage) => {
             im.encode("png", function (err, buffer) {
-              if (err) throw err;
+              if (err)
+                throw err;
               let returnedB64Raster = Buffer.from(buffer).toString("base64");
-              fs.writeFile(outputFilename, buffer, function (err) {
-                if (err) throw err;
-                console.log("Imagem do rastro salva em: " + outputFilename);
+              fs.writeFile(outputFilename(trailsFileName), buffer, function (err) {
+                if (err)
+                  throw err;
+                console.log("Imagem do rastro salva em: " + outputFilename(trailsFileName));
               });
-              fs.writeFileSync("./assets/txtFiles/rasterMapBase64File.txt", returnedB64Raster);
+              fs.writeFileSync(`./assets/txtFiles/${(new Date().getTime())}-rasterMapBase64File.txt`, returnedB64Raster);
             });
-            
-          console.log("SUCESSO IMAGEM DO RASTRO GERADA!");
-        },
-        (err) => {
-          console.log(err);
-        }
-      );
+
+            console.log("SUCESSO IMAGEM DO RASTRO GERADA!");
+          },
+          (err) => {
+            console.log(err);
+          }
+        );
+      });
     });
   });
-});
+}
 
 //generate background image
 async function getMapboxImage(bbox) {
@@ -122,9 +167,9 @@ async function getMapboxImage(bbox) {
       return returnedB64;
     });
     let returnedB64 = Buffer.from(staticMapImage.data).toString("base64");
-    
-  fs.writeFileSync("./assets/imagesFiles/backgroundImageMap.jpeg", staticMapImage.data);
-  fs.writeFileSync("./assets/txtFiles/node backgroundBase64.txt", returnedB64);
+    //gera um arquivo de imagem com background da imagem de satelite
+  fs.writeFileSync(`./assets/imagesFiles/${(new Date().getTime())}-backgroundImageMap.jpeg`, staticMapImage.data);
+  fs.writeFileSync(`./assets/txtFiles/${(new Date().getTime())}-backgroundBase64.txt`, returnedB64);
 
   return returnedB64;
 }

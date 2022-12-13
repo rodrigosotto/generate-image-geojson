@@ -26,5 +26,8 @@
     "mapnik": "^4.5.9",
     "merge-images": "^2.0.0",
     "xml-js": "^1.6.11"
+  },
+  "devDependencies": {
+    "webpack-cli": "^5.0.1"
   }
 }
