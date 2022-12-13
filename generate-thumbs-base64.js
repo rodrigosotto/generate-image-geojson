@@ -1,6 +1,7 @@
 var mapnik = require("mapnik");
 var mapnikify = require("@mapbox/geojson-mapnikify");
 const { default: bbox } = require("@turf/bbox");
+const { default: rewind } = require("@turf/rewind");
 const axios = require("axios");
 
 var fs = require("fs");
@@ -11,14 +12,56 @@ var height = 1024;
 var outputFilename = "./assets/imagesFiles/imageRaster.png";
 
 /* read GeoJSON into variable */
-var filename = "./assets/geojsonFiles/simple.geojson";
+// var filename = "./assets/geojsonFiles/dolomito.geojson";
+
+var filename = "./assets/jsonFiles/pigente";
 var geojson = JSON.parse(fs.readFileSync(filename));
 
+const features = geojson.trails.inst_rate.map(
+  (instRate) => rewind({
+          type: 'Feature',
+          properties: {},
+          geometry: {
+              type: 'Polygon',
+              coordinates: [
+                  [
+                      ...instRate.paths.map(
+                          (element) => [
+                              element.lng,
+                              element.lat,
+                          ]
+                      ),
+                      [instRate.paths[0].lng, instRate.paths[0].lat],
+                  ],
+              ],
+          },
+      })
+);
+
+const featureCollection = {
+  type: 'FeatureCollection',
+  features,
+};
+
+// const result = await generateThumbnailImage(featureCollection).catch(
+//   (err) => err
+// );
+
+// if (result.backgroundImage && result.rasterImage) {
+//   console.log("Resultado Background",result.backgroundImage);
+//   console.log("Resultado Rastros",result.rasterImage);
+// }
+
+
+// console.log(4, params, 4);
+// console.log(5, params.data?.event, 5);
+
+
 /* convert GeoJSON to Mapnik XML */
-mapnikify(geojson, false, function (err, xml) {
+mapnikify(featureCollection, false, function (err, xml) {
   if (err) throw err;
 
-  const geojsonBBox = bbox(geojson);
+  const geojsonBBox = bbox(featureCollection);
   /* render the Mapnik XML */
   var map = new mapnik.Map(width, height);
 
@@ -81,7 +124,7 @@ async function getMapboxImage(bbox) {
     let returnedB64 = Buffer.from(staticMapImage.data).toString("base64");
     
   fs.writeFileSync("./assets/imagesFiles/backgroundImageMap.jpeg", staticMapImage.data);
-  fs.writeFileSync("./assets/txtFiles/backgroundBase64.txt", returnedB64);
+  fs.writeFileSync("./assets/txtFiles/node backgroundBase64.txt", returnedB64);
 
   return returnedB64;
 }
