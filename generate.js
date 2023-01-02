@@ -130,16 +130,18 @@ function generateImageFromGeojson(featureCollection, trailsFileName) {
             im.encode("png", function (err, buffer) {
               if (err)
                 throw err;
-              let returnedB64Raster = Buffer.from(buffer).toString("base64");
-              fs.writeFile(outputFilename(trailsFileName), buffer, function (err) {
-                if (err)
-                  throw err;
-                console.log("Imagem do rastro salva em: " + outputFilename(trailsFileName));
-              });
-              fs.writeFileSync(`./assets/txtFiles/${(new Date().getTime())}-rasterMapBase64File.txt`, returnedB64Raster);
+                let returnedB64Raster = Buffer.from(buffer).toString("base64");
+                console.log("Rastro->",returnedB64Raster, "<- Rastro");
+            //   fs.writeFile(outputFilename(trailsFileName), buffer, function (err) {
+            //     if (err)
+            //       throw err;
+            //     console.log("Imagem do rastro salva em: " + outputFilename(trailsFileName));
+            //   });
+            //   fs.writeFileSync(`./assets/txtFiles/${(new Date().getTime())}-rasterMapBase64File.txt`, returnedB64Raster);
             });
 
-            console.log("SUCESSO IMAGEM DO RASTRO GERADA!");
+            //console.log("SUCESSO IMAGEM DO RASTRO GERADA!");
+
           },
           (err) => {
             console.log(err);
@@ -164,12 +166,14 @@ async function getMapboxImage(bbox) {
     .get(url, { responseType: "arraybuffer" })
     .catch((error) => {
       console.log(error);
-      return returnedB64;
+      return returnedB64Background;
     });
-    let returnedB64 = Buffer.from(staticMapImage.data).toString("base64");
+    let returnedB64Background = Buffer.from(staticMapImage.data).toString("base64");
     //gera um arquivo de imagem com background da imagem de satelite
-  fs.writeFileSync(`./assets/imagesFiles/${(new Date().getTime())}-backgroundImageMap.jpeg`, staticMapImage.data);
-  fs.writeFileSync(`./assets/txtFiles/${(new Date().getTime())}-backgroundBase64.txt`, returnedB64);
+//   fs.writeFileSync(`./assets/imagesFiles/${(new Date().getTime())}-backgroundImageMap.jpeg`, staticMapImage.data);
+//   fs.writeFileSync(`./assets/txtFiles/${(new Date().getTime())}-backgroundBase64.txt`, returnedB64);
 
-  return returnedB64;
+  console.log("Background ->",returnedB64Background,"<- Background");
+  return returnedB64Background;
+
 }

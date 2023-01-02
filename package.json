@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf build && prettier --write src/ && tsc"
   },
   "repository": {
     "type": "git",
@@ -20,10 +21,11 @@
   "dependencies": {
     "@mapbox/geojson-mapnikify": "^3.0.2-dev",
     "@mapbox/sphericalmercator": "^1.2.0",
-    "@turf/turf": "^6.5.0",
-    "axios": "^1.2.0",
     "geojson-mapnikify-image": "^1.0.3",
     "mapnik": "^4.5.9",
+    "@turf/turf": "^6.5.0",
+    "axios": "^1.2.0",
+    "bcrypt": "^5.1.0",
     "merge-images": "^2.0.0",
     "xml-js": "^1.6.11"
   },
